@@ -6,15 +6,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rkcreadev.demo.akka.AkkaApplication;
 import com.rkcreadev.demo.akka.model.json.ClientSubscribersPayments;
 import com.rkcreadev.demo.akka.model.json.SubscriberPayment;
+import com.rkcreadev.demo.akka.util.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.internal.util.io.IOUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -24,14 +25,16 @@ import java.util.Random;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = AkkaApplication.class)
-public class InboxLoaderActorTest {
+public class InboxLoaderFilesGenerator {
 
     @Autowired
     private ObjectMapper objectMapper;
+    @Value("${inbox.dir}")
+    private String inboxDir;
 
     @Before
     public void clear() throws IOException {
-        Files.list(Paths.get("/tmp/akka/inbox/"))
+        Files.list(Paths.get(inboxDir))
                 .forEach(path -> {
                     try {
                         Files.delete(path);
@@ -48,10 +51,10 @@ public class InboxLoaderActorTest {
         Random random = new Random();
 
         random.longs(1000, 2000)
-                .limit(50)
+                .limit(50000)
                 .forEach(id -> {
                     ClientSubscribersPayments csp = new ClientSubscribersPayments();
-                    csp.setClientId(123L);
+                    csp.setClientId(id);
                     csp.setSubscribers(subscriberPayments());
                     clients.add(csp);
                 });
@@ -59,7 +62,7 @@ public class InboxLoaderActorTest {
         clients.forEach(client -> {
             try {
                 IOUtil.writeText(objectMapper.writeValueAsString(client),
-                        new File("/tmp/akka/inbox/" + client.getClientId() + ".json"));
+                        Paths.get(inboxDir, FileUtils.getJsonFileName(client.getClientId())).toFile());
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
@@ -71,7 +74,7 @@ public class InboxLoaderActorTest {
         Random random = new Random();
 
         random.longs(0, 200)
-                .limit(200)
+                .limit(150)
                 .forEach(id -> {
                     SubscriberPayment sb = new SubscriberPayment();
                     sb.setId(id);

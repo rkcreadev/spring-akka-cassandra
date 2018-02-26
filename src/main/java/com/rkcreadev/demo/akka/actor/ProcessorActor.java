@@ -2,7 +2,6 @@ package com.rkcreadev.demo.akka.actor;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
-import com.rkcreadev.demo.akka.actor.writer.WriterActor;
 import com.rkcreadev.demo.akka.model.db.ClientInfo;
 import com.rkcreadev.demo.akka.model.json.ClientSubscribersPayments;
 import com.rkcreadev.demo.akka.model.json.SubscriberPayment;
@@ -54,7 +53,7 @@ public class ProcessorActor extends AbstractActor {
     }
 
     @AllArgsConstructor
-    static class IncomingData {
+    public static class IncomingData {
         private ClientSubscribersPayments payments;
     }
 }

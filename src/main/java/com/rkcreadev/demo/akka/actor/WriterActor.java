@@ -1,4 +1,4 @@
-package com.rkcreadev.demo.akka.actor.writer;
+package com.rkcreadev.demo.akka.actor;
 
 import akka.actor.AbstractActor;
 import com.rkcreadev.demo.akka.mapping.ClientInfoMapper;
@@ -34,7 +34,7 @@ public class WriterActor extends AbstractActor {
     }
 
     @AllArgsConstructor
-    public static class IncomingData {
+    static class IncomingData {
         private ClientInfo clientInfo;
     }
 }
