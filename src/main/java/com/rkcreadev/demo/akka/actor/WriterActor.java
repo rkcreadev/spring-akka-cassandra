@@ -2,8 +2,8 @@ package com.rkcreadev.demo.akka.actor;
 
 import akka.actor.AbstractActor;
 import com.rkcreadev.demo.akka.mapping.ClientInfoMapper;
-import com.rkcreadev.demo.akka.model.db.ClientInfo;
-import com.rkcreadev.demo.akka.service.WriterService;
+import com.rkcreadev.demo.akka.model.db.common.ClientInfo;
+import com.rkcreadev.demo.akka.service.ClientInfoService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -14,12 +14,13 @@ import org.springframework.stereotype.Component;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class WriterActor extends AbstractActor {
 
-    private WriterService writerService;
+    private ClientInfoService clientInfoService;
     private ClientInfoMapper clientInfoMapper;
 
+
     @Autowired
-    public WriterActor(WriterService writerService, ClientInfoMapper clientInfoMapper) {
-        this.writerService = writerService;
+    public WriterActor(ClientInfoService clientInfoService, ClientInfoMapper clientInfoMapper) {
+        this.clientInfoService = clientInfoService;
         this.clientInfoMapper = clientInfoMapper;
     }
 
@@ -27,8 +28,8 @@ public class WriterActor extends AbstractActor {
     public Receive createReceive() {
         return receiveBuilder()
                 .match(IncomingData.class, incomingData -> {
-                    ClientInfo clientInfo = writerService.saveToDb(incomingData.clientInfo);
-                    writerService.saveToFs(clientInfoMapper.mapToDto(clientInfo));
+                    clientInfoService.saveToDb(incomingData.clientInfo);
+                    clientInfoService.saveToFs(clientInfoMapper.mapToDto(incomingData.clientInfo));
                 })
                 .build();
     }

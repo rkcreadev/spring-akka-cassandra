@@ -1,0 +1,29 @@
+version: '2'
+services:
+  cassandra-1:
+    container_name: cassandra-1
+    hostname: cassandra-1
+    image: cassandra:latest
+    expose:
+      - 7000
+      - 7001
+      - 7199
+      - 9042
+      - 9160
+
+  cassandra-2:
+    hostname: cassandra-2
+    container_name: cassandra-2
+    image: cassandra:latest
+    depends_on:
+      - cassandra-1
+    environment:
+      - CASSANDRA_SEEDS=cassandra-1
+    links:
+      - cassandra-1
+    expose:
+      - 7000
+      - 7001
+      - 7199
+      - 9042
+      - 9160

@@ -2,7 +2,7 @@ package com.rkcreadev.demo.akka.actor;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
-import com.rkcreadev.demo.akka.model.db.ClientInfo;
+import com.rkcreadev.demo.akka.model.db.common.ClientInfo;
 import com.rkcreadev.demo.akka.model.json.ClientSubscribersPayments;
 import com.rkcreadev.demo.akka.model.json.SubscriberPayment;
 import com.rkcreadev.demo.akka.service.ActorService;

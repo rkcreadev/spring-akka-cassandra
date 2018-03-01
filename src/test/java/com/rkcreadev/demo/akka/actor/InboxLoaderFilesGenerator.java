@@ -3,37 +3,39 @@ package com.rkcreadev.demo.akka.actor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rkcreadev.demo.akka.AkkaApplication;
 import com.rkcreadev.demo.akka.model.json.ClientSubscribersPayments;
 import com.rkcreadev.demo.akka.model.json.SubscriberPayment;
 import com.rkcreadev.demo.akka.util.FileUtils;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.internal.util.io.IOUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Random;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = AkkaApplication.class)
 public class InboxLoaderFilesGenerator {
 
-    @Autowired
-    private ObjectMapper objectMapper;
-    @Value("${inbox.dir}")
-    private String inboxDir;
+    private static ObjectMapper objectMapper;
+    private static String inboxDir;
+    private static Long filesCount;
+    private static Long subscribersCount;
 
-    @Before
-    public void clear() throws IOException {
+    private static void prepare() throws IOException {
+        objectMapper = new ObjectMapper();
+        InputStream propsFile = InboxLoaderFilesGenerator.class.getClassLoader()
+                .getResourceAsStream("application.properties");
+        Properties properties = new Properties();
+        properties.load(propsFile);
+
+        inboxDir = properties.getProperty("inbox.dir");
+        filesCount = Long.valueOf(properties.getProperty("generator.files.count"));
+        subscribersCount = Long.valueOf(properties.getProperty("generator.subscribers.count"));
+
         Files.list(Paths.get(inboxDir))
                 .forEach(path -> {
                     try {
@@ -44,14 +46,20 @@ public class InboxLoaderFilesGenerator {
                 });
     }
 
-    @Test
-    public void generate() {
+    public static void main(String... args) {
+        try {
+            prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error while preparing  to generate");
+        }
+
         List<ClientSubscribersPayments> clients = new ArrayList<>();
 
         Random random = new Random();
 
         random.longs(1000, 2000)
-                .limit(50000)
+                .limit(filesCount)
                 .forEach(id -> {
                     ClientSubscribersPayments csp = new ClientSubscribersPayments();
                     csp.setClientId(id);
@@ -69,12 +77,12 @@ public class InboxLoaderFilesGenerator {
         });
     }
 
-    private List<SubscriberPayment> subscriberPayments() {
+    private static List<SubscriberPayment> subscriberPayments() {
         List<SubscriberPayment> subscriberPaymentList = new ArrayList<>();
         Random random = new Random();
 
         random.longs(0, 200)
-                .limit(150)
+                .limit(subscribersCount)
                 .forEach(id -> {
                     SubscriberPayment sb = new SubscriberPayment();
                     sb.setId(id);

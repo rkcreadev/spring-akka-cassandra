@@ -12,6 +12,8 @@ public class AkkaConfiguration {
 
     private ApplicationContext applicationContext;
 
+    private static final String SYSTEM_NAME = "testSystem";
+
     @Autowired
     public AkkaConfiguration(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
@@ -19,7 +21,7 @@ public class AkkaConfiguration {
 
     @Bean
     public ActorSystem actorSystem() {
-        return ActorSystem.create("testSystem");
+        return ActorSystem.create(SYSTEM_NAME);
     }
 
     @Bean
