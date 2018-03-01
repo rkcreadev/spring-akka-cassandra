@@ -46,18 +46,31 @@ public class InboxCheckingScheduler {
         this.clientInfoService = clientInfoService;
     }
 
-    @Scheduled(fixedRate = 1 * 1000)
+    @Scheduled(fixedRate = 30 * 1000)
     public void checkInbox() throws IOException {
         if (!enableScheduling) {
             return;
         }
 
+        long before = System.currentTimeMillis();
+        final long[] newFilesCount = {0};
+
         try (Stream<Path> files = Files.list(Paths.get(inboxPath))) {
             ActorRef processorActors = actorService.getWithRoundRobin(ProcessorActor.class, countProcessorActors);
 
             getNewClientSubscriberPayments(files)
+                    .peek(csp -> newFilesCount[0]++)
                     .forEach(clientSubscribersPayments -> sendToActor(processorActors, clientSubscribersPayments));
         }
+        long after = System.currentTimeMillis();
+
+        if (newFilesCount[0] == 0) {
+            return;
+        }
+
+        log.warn("------------------------------------");
+        log.warn("Method execution time: " + (after - before) + " milliseconds");
+        log.warn("------------------------------------");
     }
 
     private Stream<ClientSubscribersPayments> getNewClientSubscriberPayments(Stream<Path> files) {
