@@ -7,4 +7,5 @@ public interface ClientInfoService {
     void saveToDb(ClientInfo clientInfo);
     boolean existsById(Long clientId);
     void saveToFs(ClientInfoDto clientInfoDto);
+    void truncateAll();
 }

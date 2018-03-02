@@ -1,19 +1,16 @@
 package com.rkcreadev.demo.akka.model.db.cassandra;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.Table;
 
-@Table("client_info")
-@AllArgsConstructor
-@NoArgsConstructor
+
+@Table("subscriber")
 @Data
-public class ClientInfoCassandra {
+public class SubscriberCassandra {
     @Id
-    private Long clientId;
+    private Long id;
     @Column
-    private Long spentTotal;
+    private Long spent;
 }

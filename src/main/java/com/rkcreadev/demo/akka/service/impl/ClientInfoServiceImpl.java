@@ -52,4 +52,9 @@ public class ClientInfoServiceImpl implements ClientInfoService {
             throw new RuntimeException("Error while saving to file system", e);
         }
     }
+
+    @Override
+    public void truncateAll() {
+        activeDbConfiguration.truncateAll(dbVisitor);
+    }
 }

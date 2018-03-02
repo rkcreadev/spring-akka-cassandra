@@ -19,14 +19,18 @@ public final class FileUtils {
         return Long.valueOf(fileName.split(".json")[0]);
     }
 
-    public static Long moveFile(String inboxDir, Path destDir, Long clientId) {
+    public static Long moveFile(String src, Path destDir, Long clientId) {
         try {
-            Files.move(Paths.get(inboxDir, FileUtils.getJsonFileName(clientId)),
-                    destDir.resolve(FileUtils.getJsonFileName(clientId)),
-                    StandardCopyOption.REPLACE_EXISTING);
+            Path inputFile = Paths.get(src, FileUtils.getJsonFileName(clientId));
+
+            if (!Files.exists(inputFile)) {
+                return null;
+            }
+
+            Files.move(inputFile, destDir.resolve(FileUtils.getJsonFileName(clientId)),
+                    StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
             return clientId;
         } catch (IOException e) {
-            e.printStackTrace();
             return null;
         }
     }

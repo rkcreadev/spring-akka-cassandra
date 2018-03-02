@@ -12,8 +12,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -34,21 +33,18 @@ public class ProcessorActor extends AbstractActor {
     }
 
     private void process(ClientSubscribersPayments payments) {
-        Set<Long> uniqueSubscriberIds = new HashSet<>();
-
         long spentTotal = payments.getSubscribers()
                 .stream()
-                .peek(subscriberPayment -> uniqueSubscriberIds.add(subscriberPayment.getId()))
                 .map(SubscriberPayment::getSpent)
                 .reduce((a, b) -> a + b)
                 .orElse(0L);
 
-        sendToWriteActor(payments.getClientId(), spentTotal, uniqueSubscriberIds);
+        sendToWriteActor(payments.getClientId(), spentTotal, payments.getSubscribers());
     }
 
-    private void sendToWriteActor(Long clientId, long spentTotal, Set<Long> uniqueSubscriberIds) {
+    private void sendToWriteActor(Long clientId, long spentTotal, List<SubscriberPayment> subscriberPayments) {
         actorService.get(WriterActor.class)
-                .tell(new WriterActor.IncomingData(new ClientInfo(clientId, spentTotal, uniqueSubscriberIds)),
+                .tell(new WriterActor.IncomingData(new ClientInfo(clientId, spentTotal, subscriberPayments)),
                         ActorRef.noSender());
     }
 

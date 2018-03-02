@@ -1,10 +1,11 @@
 package com.rkcreadev.demo.akka.model.db.common;
 
+import com.rkcreadev.demo.akka.model.json.SubscriberPayment;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -12,5 +13,5 @@ import java.util.Set;
 public class ClientInfo {
     private Long clientId;
     private Long spentTotal;
-    private Set<Long> subscribers;
+    private List<SubscriberPayment> subscribers;
 }
